@@ -96,18 +96,65 @@ does not upload it.
 
 Run the blocker experiments on:
 
-- At least one physical iPhone on the oldest iOS version proposed for support
-- At least one physical iPhone on the current production iOS version
+- A physical iPhone 15 running iOS 26.6, the minimum supported product
+  environment
+- A physical iPhone 15 running the current production iOS version when it is
+  newer than iOS 26.6
 - A normal browser tab
 - An icon added to the Home Screen and opened in app-like mode
 - Online and airplane-mode conditions where the experiment requires both
 
-When practical, include a smaller/older phone and a current phone with a larger
-display. Record Low Power Mode, Auto-Lock setting, orientation lock, and whether
-the phone is being mirrored when those settings can affect an observation.
+One iPhone 15 may satisfy both OS-version entries when iOS 26.6 is the current
+production version. If the versions differ, evidence from both environments is
+required; this may require two devices or completing the iOS 26.6 runs before a
+test device is updated.
 
-The supported iOS floor is not selected by this specification. Results may be
-used to recommend one.
+Other iPhone models and display sizes are useful supplementary coverage but do
+not gate the risk-lab milestone. Record Low Power Mode, Auto-Lock setting,
+orientation lock, and whether the phone is being mirrored when those settings
+can affect an observation.
+
+The product support floor for this lab is iOS 26.6 on iPhone 15. A failure in
+that environment must not be dismissed because the same case passes on a newer
+iOS version or another iPhone model.
+
+## Hosting and deployment
+
+The lab is hosted as a public GitHub Pages project site at a stable URL under
+the repository path. The implementation must account for that path in resource,
+manifest, and service-worker URLs and scope.
+
+Deployment uses a manually triggered GitHub Actions workflow and the protected
+`github-pages` deployment environment. A push to the default branch does not
+automatically replace the active test version. Each deployed build visibly
+identifies, and includes in exported evidence, its source commit, build
+identifier, report-schema version, and fixture-schema version.
+
+Update cases use reproducible version-one and version-two commits or tags
+deployed in sequence to the same stable URL. This exercises an actual
+service-worker update rather than treating separate URLs as an update. The lab
+must make offline readiness and the currently active version observable.
+
+The deployed application and all bundled fixtures are public and contain only
+synthetic data. GitHub necessarily receives ordinary requests for hosted
+resources, but the lab sends no analytics, evidence, identifiers, fixtures, or
+other application data to GitHub or any other service. Reports remain on the
+device unless the tester explicitly exports them.
+
+## Physical test setup
+
+The required mirroring target is a television. At test time, record the
+television model, any receiver or intermediary, the mirroring or connection
+method, resolution where observable, viewing distance, and relevant overscan or
+picture settings. This exact setup is the milestone-gating RL-DSP environment;
+additional televisions or mirroring paths provide supplementary evidence.
+
+## Speech experiment scope
+
+Speech experiments exercise only voices exposed by the browser or operating
+system. A third-party speech provider is outside this lab's scope. Adding one
+later requires a separately approved privacy and network experiment
+specification and is not an extension of RL-SPE by default.
 
 ## Experiment priority
 
@@ -423,15 +470,14 @@ The risk-lab milestone is complete when:
 7. The lab is frozen for evidence reproduction or discarded; it is not adopted
    silently as main-application scaffolding.
 
-## Decisions required before implementation
+## Implementation decision status
 
-- Whether lab code lives in a separate repository or an isolated, clearly
-  disposable directory. A separate repository is recommended to prevent
-  accidental architectural inheritance.
-- The oldest iOS version proposed for product support.
-- Which physical iPhones and television/mirroring setup are available.
-- The temporary HTTPS hosting location and how a specific lab version is
-  identified during update tests.
-- Whether browser-exposed voices are the only online-speech surface tested.
-  Adding a third-party speech provider requires a separate privacy and network
-  experiment specification.
+The repository boundary, minimum supported environment, required physical
+device, television mirroring target, hosting and version-identification
+strategy, and speech-provider scope are resolved. No remaining environment or
+scope decision blocks the implementation-neutral evidence and experiment
+design.
+
+Selecting an implementation stack and creating application scaffolding remain
+separate later decisions. They must not begin until the evidence contract,
+experiment mechanics, and case-to-evidence mappings have been reviewed.
