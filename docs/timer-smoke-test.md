@@ -103,3 +103,9 @@ RL-TIM is sufficient to retain a candidate lab stack when it can:
 A stack that obstructs these checks or requires substantial application
 architecture should be rejected for the lab. That decision does not
 automatically select or reject the main application's eventual stack.
+
+## Recorded results
+
+The initial deployed-slice result and its evidence limitations are recorded in
+[`test-results.md`](test-results.md). Results in that log do not replace the
+case procedures or repetition requirements in this plan.
