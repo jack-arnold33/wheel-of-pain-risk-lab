@@ -483,6 +483,8 @@ strategy, and speech-provider scope are resolved. No remaining environment or
 scope decision blocks the implementation-neutral evidence and experiment
 design.
 
-Selecting an implementation stack and creating application scaffolding remain
-separate later decisions. They must not begin until the evidence contract,
-experiment mechanics, and case-to-evidence mappings have been reviewed.
+The smoke-test evidence guide and initial RL-TIM mapping have been reviewed.
+The approved candidate risk-assessment stack is recorded in
+[`stack-decision.md`](stack-decision.md). Its use proves the proposed
+technologies alongside the PWA capabilities; it does not turn the lab into the
+main application's production scaffolding.

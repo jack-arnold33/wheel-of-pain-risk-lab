@@ -1,0 +1,27 @@
+{
+  "name": "wheel-of-pain-risk-lab",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "packageManager": "pnpm@11.19.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "dexie": "^4.4.5",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@types/node": "^26.3.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.5",
+    "@vitejs/plugin-react": "^6.1.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.2.2",
+    "vite-plugin-pwa": "^1.3.0",
+    "workbox-precaching": "^7.4.1"
+  }
+}
