@@ -14,6 +14,11 @@ application's technical stack or architecture.
 The platform risks being investigated are recorded in
 [`ios-pwa-risks.md`](ios-pwa-risks.md).
 
+Implementation-neutral details derived from this specification are recorded in
+the [`smoke-test evidence guide`](evidence-contract.md) and
+[`RL-TIM smoke-test plan`](timer-smoke-test.md). This specification remains
+authoritative if a derived design document conflicts with it.
+
 ## Goals
 
 - Produce repeatable evidence for timer recovery, wake lock, offline operation,
