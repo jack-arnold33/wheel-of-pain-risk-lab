@@ -45,6 +45,18 @@ the risk lab on the iPhone. The deployment succeeded because GitHub forced the
 Node.js 20-based action to run on Node.js 24.
 
 The workflow now uses `pnpm/action-setup@v6`, whose action runtime targets
-Node.js 24. The next deployment should confirm that the annotation is absent;
-if it remains, record the exact action named by GitHub before changing another
-workflow dependency.
+Node.js 24. The tester confirmed that the next successful GitHub Pages
+deployment no longer emitted the Node.js 20 annotation. This deployment
+maintenance item is resolved.
+
+## 2026-08-24: Home Screen and offline checkpoint
+
+The tester reported that the PWA was added to the iPhone Home Screen, fully
+closed, and then cold-launched successfully in airplane mode. The fixed timer
+also ran through Complete while the device remained offline.
+
+This is a passing engineering checkpoint for RL-OFF-01 through RL-OFF-04 on
+the reported physical iPhone 15. The exact iOS version and exported run JSON
+were not supplied to the repository, so the result does not replace the full
+environment record or repetition requirement. RL-OFF-05 through RL-OFF-07
+remain open.
