@@ -11,6 +11,7 @@ remains disposable.
 - [Risk-lab specification](docs/risk-lab.md)
 - [Smoke-test evidence](docs/evidence-contract.md)
 - [RL-TIM smoke-test plan](docs/timer-smoke-test.md)
+- [RL-WAK smoke-test plan](docs/wake-lock-smoke-test.md)
 - [Recorded smoke-test results](docs/test-results.md)
 - [Candidate PWA stack](docs/stack-decision.md)
 - Source specification commit:

@@ -3,14 +3,26 @@ import type { TimerStatus } from './timer'
 
 export type Verdict = 'Pass' | 'Fail' | 'Inconclusive' | 'Not Supported'
 
+export type LabCaseId =
+  | 'RL-TIM-01'
+  | 'RL-TIM-02'
+  | 'RL-WAK-01'
+  | 'RL-WAK-02'
+  | 'RL-WAK-03'
+  | 'RL-WAK-04'
+  | 'RL-WAK-05'
+
 export interface LabRun {
   id: string
-  caseId: 'RL-TIM-01' | 'RL-TIM-02'
+  caseId: LabCaseId
   buildId: string
   deviceModel: string
   osVersion: string
   browser: string
   launchMode: string
+  autoLock?: string
+  lowPowerMode?: string
+  mirroring?: string
   startedAt: string
   endedAt?: string
   verdict?: Verdict
