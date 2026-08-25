@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">Wheel of Pain Risk Lab</title>
+  <rect width="512" height="512" rx="96" fill="#182033"/>
+  <circle cx="256" cy="256" r="156" fill="none" stroke="#5dd6c0" stroke-width="28"/>
+  <path d="M256 116v58m0 164v58M116 256h58m164 0h58M157 157l42 42m114 114 42 42m0-198-42 42M199 313l-42 42" stroke="#ffcc66" stroke-width="22" stroke-linecap="round"/>
+  <circle cx="256" cy="256" r="58" fill="#ff6b6b"/>
+  <path d="M256 214v48l34 20" fill="none" stroke="#0c111b" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
