@@ -60,3 +60,26 @@ the reported physical iPhone 15. The exact iOS version and exported run JSON
 were not supplied to the repository, so the result does not replace the full
 environment record or repetition requirement. RL-OFF-05 through RL-OFF-07
 remain open.
+
+## 2026-08-24: Screen wake-lock checkpoint
+
+After the wake-lock build was deployed and the installed PWA adopted the new
+service-worker version, the tester reported these physical iPhone 15 results:
+
+| Case | Verdict |
+| --- | --- |
+| RL-WAK-01: retain wake lock while running | Pass |
+| RL-WAK-02: retain wake lock while paused | Pass |
+| RL-WAK-03: detect release and reacquire after returning | Pass |
+| RL-WAK-04: retain through Complete and release on Done | Pass |
+| RL-WAK-05: release immediately on early End | Pass |
+
+The repository does not contain the exported run JSON or exact iOS version,
+so this remains tester-reported engineering evidence. TV-mirroring coverage
+was not confirmed separately.
+
+The first launch after deployment initially showed the prior cached UI. The
+tester confirmed that the new build appeared after the installed PWA adopted
+the update. This establishes that updates can be retrieved, but it also
+demonstrates the need for visible, safe service-worker update activation in the
+actual product.
