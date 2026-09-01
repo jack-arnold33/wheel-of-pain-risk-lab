@@ -6,6 +6,7 @@ import {
   type TimerProjection,
   type TimerStatus,
 } from './timer'
+import SpeechExperiment from './SpeechExperiment'
 
 const CALLBACK_DELAY_MS = 10_000
 
@@ -23,6 +24,9 @@ interface EnvironmentForm {
   autoLock: string
   lowPowerMode: 'off' | 'on'
   mirroring: 'none' | 'tv'
+  receiverModel: string
+  routingConfiguration: string
+  musicPlaying: 'no' | 'yes'
 }
 
 type WakeLockStatus =
@@ -41,6 +45,22 @@ const CASE_EXPECTATIONS: Record<LabCaseId, string> = {
   'RL-WAK-03': 'Release while hidden is detected and the lock is reacquired when visible.',
   'RL-WAK-04': 'The lock remains active through Complete and releases after Done.',
   'RL-WAK-05': 'Ending the run early releases the screen wake lock immediately.',
+  'RL-SPE-09': 'Browser SpeechSynthesis output is recorded without mirroring.',
+  'RL-SPE-10': 'Browser SpeechSynthesis output is recorded while mirrored.',
+  'RL-SPE-11': 'Static generated speech played by HTMLAudioElement reaches the expected mirrored output.',
+  'RL-SPE-12': 'Static generated speech played by Web Audio reaches the expected mirrored output.',
+  'RL-SPE-13': 'Phone, TV, both, or neither is recorded for every playback path.',
+  'RL-SPE-14': 'Browser-tab and Home Screen results are recorded separately.',
+  'RL-SPE-15': 'Speech routing and audibility are recorded while representative music plays.',
+  'RL-SPE-16': 'At least 20 static playbacks complete without unexplained routing changes or duplicates.',
+  'RL-SPE-17': 'Background and restore do not replay a missed or completed utterance.',
+  'RL-SPE-18': 'Portrait and landscape rotation do not change routing unexpectedly.',
+  'RL-SPE-19': 'An interruption is recorded without corrupting timer state or replaying late speech.',
+  'RL-SPE-20': 'Prepared audio begins within approximately 250 ms of the simulated transition.',
+  'RL-SPE-21': 'Live request-to-first-byte and ready latency are recorded through the server proxy.',
+  'RL-SPE-22': 'Network failure is contained to speech and timer behavior remains independent.',
+  'RL-SPE-23': 'Failed, cancelled, or late results are rejected and never replayed at a later transition.',
+  'RL-SPE-24': 'Timer projection and controls remain independent of speech generation and playback.',
 }
 
 function detectDisplayMode() {
@@ -62,6 +82,9 @@ function App() {
     autoLock: '30 seconds',
     lowPowerMode: 'off',
     mirroring: 'none',
+    receiverModel: '',
+    routingConfiguration: '',
+    musicPlaying: 'no',
   })
   const [selectedCase, setSelectedCase] = useState<LabCaseId>('RL-TIM-01')
   const [projection, setProjection] = useState<TimerProjection>(initialProjection)
@@ -293,6 +316,9 @@ function App() {
           autoLock: run.autoLock ?? 'not recorded',
           lowPowerMode: run.lowPowerMode === 'on' ? 'on' : 'off',
           mirroring: run.mirroring === 'tv' ? 'tv' : 'none',
+          receiverModel: run.receiverModel ?? '',
+          routingConfiguration: run.routingConfiguration ?? '',
+          musicPlaying: run.musicPlaying === 'yes' ? 'yes' : 'no',
         })
         setEvents(savedEvents)
         setProjection(projectTimer(elapsedMs, status))
@@ -536,6 +562,9 @@ function App() {
       autoLock: run.autoLock ?? 'not recorded',
       lowPowerMode: run.lowPowerMode === 'on' ? 'on' : 'off',
       mirroring: run.mirroring === 'tv' ? 'tv' : 'none',
+      receiverModel: run.receiverModel ?? '',
+      routingConfiguration: run.routingConfiguration ?? '',
+      musicPlaying: run.musicPlaying === 'yes' ? 'yes' : 'no',
     })
     setEvents(storedEvents)
     timerRef.current = { status: 'idle', baseElapsedMs: 0, anchorMonotonicMs: 0 }
@@ -551,6 +580,13 @@ function App() {
     await resetTimer()
   }
 
+  async function updateRunObservation(field: 'outputDestination' | 'audibleDelay' | 'interruptions' | 'notes', value: string) {
+    if (!activeRun) return
+    const updated = { ...activeRun, [field]: value }
+    setActiveRun(updated)
+    await db.runs.put(updated)
+  }
+
   const controlsDisabled = !activeRun || Boolean(activeRun.endedAt)
 
   return (
@@ -559,7 +595,7 @@ function App() {
         <div>
           <p className="eyebrow">Disposable PWA risk lab</p>
           <h1>Wheel of Pain Risk Lab</h1>
-          <p className="subtitle">Timer, offline PWA, and screen wake-lock smoke tests</p>
+          <p className="subtitle">Timer, wake-lock, and external speech-routing smoke tests</p>
         </div>
         <dl className="status-strip">
           <div><dt>Build</dt><dd>{__LAB_BUILD__.slice(0, 8)}</dd></div>
@@ -586,9 +622,28 @@ function App() {
           <label>Auto-Lock<input value={environment.autoLock} onChange={(event) => setEnvironment({ ...environment, autoLock: event.target.value })} disabled={Boolean(activeRun)} /></label>
           <label>Low Power Mode<select value={environment.lowPowerMode} onChange={(event) => setEnvironment({ ...environment, lowPowerMode: event.target.value as EnvironmentForm['lowPowerMode'] })} disabled={Boolean(activeRun)}><option value="off">Off</option><option value="on">On</option></select></label>
           <label>Mirroring<select value={environment.mirroring} onChange={(event) => setEnvironment({ ...environment, mirroring: event.target.value as EnvironmentForm['mirroring'] })} disabled={Boolean(activeRun)}><option value="none">Not mirroring</option><option value="tv">TV</option></select></label>
-          <label>Case<select value={selectedCase} onChange={(event) => setSelectedCase(event.target.value as LabCaseId)} disabled={Boolean(activeRun)}><option value="RL-TIM-01">RL-TIM-01 · foreground</option><option value="RL-TIM-02">RL-TIM-02 · callback delay</option><option value="RL-WAK-01">RL-WAK-01 · keep awake</option><option value="RL-WAK-02">RL-WAK-02 · paused</option><option value="RL-WAK-03">RL-WAK-03 · reacquire</option><option value="RL-WAK-04">RL-WAK-04 · Complete to Done</option><option value="RL-WAK-05">RL-WAK-05 · end early</option></select></label>
+          <label>Receiver / TV<input value={environment.receiverModel} onChange={(event) => setEnvironment({ ...environment, receiverModel: event.target.value })} disabled={Boolean(activeRun)} placeholder="Model and intermediary" /></label>
+          <label>Routing configuration<input value={environment.routingConfiguration} onChange={(event) => setEnvironment({ ...environment, routingConfiguration: event.target.value })} disabled={Boolean(activeRun)} placeholder="Screen mirroring / AirPlay path" /></label>
+          <label>Workout music<select value={environment.musicPlaying} onChange={(event) => setEnvironment({ ...environment, musicPlaying: event.target.value as EnvironmentForm['musicPlaying'] })} disabled={Boolean(activeRun)}><option value="no">Not playing</option><option value="yes">Playing</option></select></label>
+          <label>Case<select value={selectedCase} onChange={(event) => setSelectedCase(event.target.value as LabCaseId)} disabled={Boolean(activeRun)}><option value="RL-TIM-01">RL-TIM-01 · foreground</option><option value="RL-TIM-02">RL-TIM-02 · callback delay</option><option value="RL-WAK-01">RL-WAK-01 · keep awake</option><option value="RL-WAK-02">RL-WAK-02 · paused</option><option value="RL-WAK-03">RL-WAK-03 · reacquire</option><option value="RL-WAK-04">RL-WAK-04 · Complete to Done</option><option value="RL-WAK-05">RL-WAK-05 · end early</option><optgroup label="External speech routing"><option value="RL-SPE-09">RL-SPE-09 · baseline, phone</option><option value="RL-SPE-10">RL-SPE-10 · baseline, mirrored</option><option value="RL-SPE-11">RL-SPE-11 · HTML audio, mirrored</option><option value="RL-SPE-12">RL-SPE-12 · Web Audio, mirrored</option><option value="RL-SPE-13">RL-SPE-13 · compare destinations</option><option value="RL-SPE-14">RL-SPE-14 · Safari vs Home Screen</option><option value="RL-SPE-15">RL-SPE-15 · with music</option><option value="RL-SPE-16">RL-SPE-16 · 20-play long session</option><option value="RL-SPE-17">RL-SPE-17 · background / restore</option><option value="RL-SPE-18">RL-SPE-18 · rotate</option><option value="RL-SPE-19">RL-SPE-19 · interrupt</option><option value="RL-SPE-20">RL-SPE-20 · prefetch transition</option><option value="RL-SPE-21">RL-SPE-21 · live latency</option><option value="RL-SPE-22">RL-SPE-22 · network failure</option><option value="RL-SPE-23">RL-SPE-23 · stale rejection</option><option value="RL-SPE-24">RL-SPE-24 · timer independence</option></optgroup></select></label>
         </div>
       </section>
+
+      {selectedCase.startsWith('RL-SPE') && (
+        <SpeechExperiment disabled={controlsDisabled} recordEvent={recordEvent} />
+      )}
+
+      {selectedCase.startsWith('RL-SPE') && activeRun && (
+        <section className="observation-panel" aria-labelledby="observation-heading">
+          <div><p className="section-label">Physical observation</p><h2 id="observation-heading">Routing result</h2></div>
+          <div className="observation-grid">
+            <label>Sound came from<select value={activeRun.outputDestination ?? ''} onChange={(event) => void updateRunObservation('outputDestination', event.target.value)}><option value="">Select after listening</option><option value="phone">Phone</option><option value="tv">TV</option><option value="both">Both</option><option value="neither">Neither</option></select></label>
+            <label>Visible / audible delay<input value={activeRun.audibleDelay ?? ''} onChange={(event) => void updateRunObservation('audibleDelay', event.target.value)} placeholder="e.g. none, ~180 ms" /></label>
+            <label>Interruptions or missing audio<input value={activeRun.interruptions ?? ''} onChange={(event) => void updateRunObservation('interruptions', event.target.value)} placeholder="Notification, dropout, duplicate…" /></label>
+            <label>Notes<textarea value={activeRun.notes ?? ''} onChange={(event) => void updateRunObservation('notes', event.target.value)} placeholder="Rotation, music audibility, repetitions, setup details" /></label>
+          </div>
+        </section>
+      )}
 
       <section className="timer-panel" aria-label="Timer smoke test">
         <div className="timer-readout">
@@ -636,6 +691,11 @@ function App() {
           <p className="test-hint">
             Set Auto-Lock to a short interval and keep the run open longer than that interval.
             The lock should stay active while running, paused, and Complete; Done or End run releases it.
+          </p>
+        ) : selectedCase.startsWith('RL-SPE') ? (
+          <p className="test-hint">
+            Keep the timer running while testing speech. Audio failure, cancellation, or a late
+            provider response must never pause, delay, or advance the timer.
           </p>
         ) : (
           <p className="test-hint">

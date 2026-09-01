@@ -11,11 +11,11 @@ scaffolding.
 
 ## Status
 
-The risk lab is **complete and frozen**. Product-level PWA feasibility was
-demonstrated on the required physical iPhone 15 environment. The project was
-closed by an explicit product decision before every originally proposed edge
-case was run; passed, deferred, and unvalidated areas are distinguished in the
-[closeout report](docs/closeout.md).
+The original PWA-feasibility milestone is **complete**. The disposable lab has
+been reopened for the separately scoped external-TTS routing experiment; this
+does not change or invalidate the original [closeout report](docs/closeout.md).
+External audio routing remains unproven until exported evidence from the
+physical iPhone and television setup is recorded.
 
 - [Risk-lab specification](docs/risk-lab.md)
 - [Smoke-test evidence](docs/evidence-contract.md)
@@ -23,6 +23,24 @@ case was run; passed, deferred, and unvalidated areas are distinguished in the
 - [RL-WAK smoke-test plan](docs/wake-lock-smoke-test.md)
 - [Recorded smoke-test results](docs/test-results.md)
 - [Risk-lab closeout](docs/closeout.md)
+- [External TTS physical-device procedure](docs/external-tts-test.md)
+- [External TTS decision record](docs/external-tts-decision.md)
 - [Candidate PWA stack](docs/stack-decision.md)
 - Source specification commit:
   [8d6eb2b](https://github.com/jack-arnold33/wheel-of-pain-timer/commit/8d6eb2b)
+
+## External TTS experiment
+
+The RL-SPE extension compares browser `SpeechSynthesis`, a pre-generated WAV
+fixture through `HTMLAudioElement`, and that same fixture through Web Audio. It
+can also prepare live audio through an optional same-origin proxy. The bundled
+fixture contains only “Test participant. Begin the next interval.” and was
+generated outside the browser with the repository script.
+
+Run `pnpm test`, `pnpm typecheck`, and `pnpm build` for automated verification.
+No lint script is configured in this repository.
+
+Live generation is opt-in. Copy `.env.live.example` to `.env.local`, set
+`OPENAI_API_KEY` only in the server process environment, run `pnpm tts-proxy`,
+and start the Vite development server separately. A static GitHub Pages build
+does not provide the proxy. Never put a provider key in a `VITE_*` variable.

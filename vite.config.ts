@@ -36,8 +36,13 @@ export default defineConfig(({ command, isPreview }) => ({
         ],
       },
       injectManifest: {
-        globPatterns: ['**/*.{js,css,html,svg,json}'],
+        globPatterns: ['**/*.{js,css,html,svg,json,wav,mp3}'],
       },
     }),
   ],
+  server: {
+    proxy: {
+      '/api/tts': 'http://127.0.0.1:8787',
+    },
+  },
 }))

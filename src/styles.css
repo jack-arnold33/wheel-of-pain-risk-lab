@@ -17,7 +17,7 @@ body {
     #0c111b;
 }
 
-button, input, select { font: inherit; }
+button, input, select, textarea { font: inherit; }
 button { min-height: 44px; }
 
 .app-shell {
@@ -63,12 +63,28 @@ h3 { margin: 0 0 0.25rem; font-size: 0.95rem; }
   background: rgba(255, 204, 102, 0.08);
 }
 
-.setup-panel, .timer-panel, .evidence-panel {
+.setup-panel, .timer-panel, .speech-panel, .observation-panel, .evidence-panel {
   border: 1px solid #2a3548;
   border-radius: 1rem;
   background: rgba(24, 32, 51, 0.82);
   box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.18);
 }
+
+.speech-panel, .observation-panel { margin-top: 1rem; padding: 1rem; }
+.speech-heading { display: flex; justify-content: space-between; gap: 1rem; align-items: start; }
+.speech-status { display: grid; grid-template-columns: repeat(4, minmax(5.5rem, 1fr)); gap: 0.5rem; margin: 0; }
+.speech-status div { min-width: 0; padding: 0.5rem; border: 1px solid #2a3548; border-radius: 0.45rem; background: #111827; }
+.speech-status dt { color: #71829c; font-size: 0.68rem; text-transform: uppercase; }
+.speech-status dd { margin: 0.2rem 0 0; overflow-wrap: anywhere; font-size: 0.82rem; }
+.privacy-note { padding: 0.75rem; border-left: 3px solid #ffcc66; color: #d6deea; background: #151923; }
+.fixture-text { color: #9dadc4; }
+.speech-controls, .buffer-controls { display: flex; flex-wrap: wrap; gap: 0.55rem; align-items: end; margin-top: 0.75rem; }
+.buffer-controls { padding-top: 0.75rem; border-top: 1px solid #2a3548; }
+.buffer-controls label { min-width: 10rem; }
+.speech-live-status { margin: 0.8rem 0 0; color: #5dd6c0; font-weight: 700; }
+.observation-panel { display: grid; grid-template-columns: minmax(12rem, 0.3fr) 1fr; gap: 1rem; }
+.observation-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+textarea { min-height: 4.5rem; resize: vertical; }
 
 .setup-panel {
   display: grid;
@@ -79,7 +95,7 @@ h3 { margin: 0 0 0.25rem; font-size: 0.95rem; }
 
 .setup-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.65rem; }
 label { color: #9dadc4; font-size: 0.75rem; font-weight: 700; }
-input, select {
+input, select, textarea {
   display: block;
   width: 100%;
   min-height: 42px;
@@ -151,6 +167,8 @@ button.danger { border-color: #ff6b6b; }
   .status-strip { grid-template-columns: repeat(3, 1fr); }
   .setup-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .event-log li { grid-template-columns: 2.5rem 8rem 1fr; }
+  .speech-heading, .observation-panel { display: grid; grid-template-columns: 1fr; }
+  .speech-status { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .event-log time { display: none; }
 }
 
@@ -163,6 +181,7 @@ button.danger { border-color: #ff6b6b; }
   .event-detail { grid-column: 2; }
   .stored-runs { grid-template-columns: 1fr; }
   .wake-lock-card { align-items: stretch; flex-direction: column; }
+  .observation-grid { grid-template-columns: 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {

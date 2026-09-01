@@ -1,5 +1,10 @@
 # Risk-lab closeout
 
+> Historical milestone record: the original PWA-feasibility lab closed at this
+> point. A later, separately scoped RL-SPE external-audio routing experiment
+> reopened the disposable harness without changing the conclusions below. See
+> [`external-tts-decision.md`](external-tts-decision.md) for its current status.
+
 ## Status and decision
 
 The Wheel of Pain Risk Lab is complete and frozen. It remains a disposable
