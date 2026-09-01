@@ -11,6 +11,22 @@ export type LabCaseId =
   | 'RL-WAK-03'
   | 'RL-WAK-04'
   | 'RL-WAK-05'
+  | 'RL-SPE-09'
+  | 'RL-SPE-10'
+  | 'RL-SPE-11'
+  | 'RL-SPE-12'
+  | 'RL-SPE-13'
+  | 'RL-SPE-14'
+  | 'RL-SPE-15'
+  | 'RL-SPE-16'
+  | 'RL-SPE-17'
+  | 'RL-SPE-18'
+  | 'RL-SPE-19'
+  | 'RL-SPE-20'
+  | 'RL-SPE-21'
+  | 'RL-SPE-22'
+  | 'RL-SPE-23'
+  | 'RL-SPE-24'
 
 export interface LabRun {
   id: string
@@ -23,6 +39,13 @@ export interface LabRun {
   autoLock?: string
   lowPowerMode?: string
   mirroring?: string
+  receiverModel?: string
+  routingConfiguration?: string
+  musicPlaying?: string
+  outputDestination?: string
+  audibleDelay?: string
+  interruptions?: string
+  notes?: string
   startedAt: string
   endedAt?: string
   verdict?: Verdict

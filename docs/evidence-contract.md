@@ -41,7 +41,10 @@ active smoke test, such as:
 - connectivity and display-mode changes;
 - wake-lock request, grant, release, or failure;
 - storage operation success or failure; and
-- speech request, result, or privacy-based refusal.
+- speech request, result, or privacy-based refusal; and
+- external-speech playback method, request start, first response byte when
+  measurable, media-ready or decode time, playback request, start, completion,
+  interruption, cancellation, failure, and stale-result rejection.
 
 Sequence number is the reliable event order if the tester changes the device
 clock. The log does not need a formal event-schema framework or exhaustive
@@ -72,9 +75,13 @@ out of scope.
 ## Privacy boundary
 
 All fixtures are synthetic. Reports remain on-device unless exported by the
-tester. The lab sends no analytics, evidence, identifiers, fixtures, or private
-text to GitHub or another service. Ordinary GitHub Pages resource and update
-requests are expected while online.
+tester. The lab sends no analytics, evidence, identifiers, or private text to
+GitHub or another service. Ordinary GitHub Pages resource and update requests
+are expected while online. The optional external-TTS case is a narrow
+exception: after explicit tester action it sends only the displayed synthetic
+fixture to the configured same-origin proxy. Exports log its fixture ID and
+character count, not the complete utterance. Provider credentials exist only
+in the proxy process environment.
 
 ## Good-enough evidence
 

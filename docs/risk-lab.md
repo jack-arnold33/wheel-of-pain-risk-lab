@@ -156,10 +156,11 @@ additional televisions or mirroring paths provide supplementary evidence.
 
 ## Speech experiment scope
 
-Speech experiments exercise only voices exposed by the browser or operating
-system. A third-party speech provider is outside this lab's scope. Adding one
-later requires a separately approved privacy and network experiment
-specification and is not an extension of RL-SPE by default.
+RL-SPE-01 through RL-SPE-08 exercise voices exposed by the browser or operating
+system. RL-SPE-09 through RL-SPE-24 are the separately approved external-audio
+routing extension. They use one generic pre-generated fixture and, when a
+server-side proxy is deliberately configured, the same generic live fixture.
+No private pack content or real participant identity is permitted.
 
 ## Experiment priority
 
@@ -345,9 +346,10 @@ offline, interruption, and Home Screen conditions?
 - Use generic fixtures such as `Test Person! Begin the test interval.`
 - Never use an imported private pack or real participant roster.
 - Online-capable speech tests require a separate explicit lab consent each run.
-- The lab does not contact a third-party speech API. It exercises only voices
-  exposed by the browser unless a later specification explicitly adds a
-  provider experiment.
+- RL-SPE-01 through RL-SPE-08 do not contact a third-party speech API.
+- RL-SPE-09 through RL-SPE-24 may contact only the configured server-side proxy
+  and only for the visible generic fixture. Provider keys must never enter the
+  browser, bundle, repository, logs, or exported evidence.
 - Network observation can reveal application requests but may not prove whether
   an operating-system voice uses an internal network service. Voice metadata
   and observed behavior must be reported without overstating certainty.
@@ -364,6 +366,22 @@ offline, interruption, and Home Screen conditions?
 | RL-SPE-06 | Explicitly consent to an identified online voice using synthetic text. | Only the current synthetic utterance is supplied; disabling consent prevents future use. |
 | RL-SPE-07 | Background, lock, interrupt audio, and return during separate utterances. | Speech may stop or fail, but the timer timeline remains independent and missed speech is not replayed. |
 | RL-SPE-08 | Repeat discovery and playback in Home Screen mode. | Differences from browser mode are recorded. |
+| RL-SPE-09 | Play Browser SpeechSynthesis without mirroring. | Baseline output destination and timing are recorded. |
+| RL-SPE-10 | Play Browser SpeechSynthesis while mirrored. | Phone, TV, both, or neither is recorded. |
+| RL-SPE-11 | Play the static fixture with HTMLAudioElement while mirrored. | Routing and playback-start timing are recorded. |
+| RL-SPE-12 | Decode and play the same fixture with Web Audio while mirrored. | Routing, decode time, and playback timing are recorded. |
+| RL-SPE-13 | Compare every playback path in an otherwise identical setup. | A destination is recorded for each path without inference from API events. |
+| RL-SPE-14 | Repeat in Safari and installed Home Screen mode. | Launch-mode differences are explicit. |
+| RL-SPE-15 | Play representative workout music during each speech path. | Audibility, routing, ducking, and interruption are noted. |
+| RL-SPE-16 | Repeat static playback at least 20 times in a representative long session. | There are no unexplained routing changes, duplicates, or late replays. |
+| RL-SPE-17 | Background and restore between separate utterances. | Missed or completed speech is not replayed. |
+| RL-SPE-18 | Rotate between portrait and landscape. | Rotation does not unexpectedly change routing or invalidate controls. |
+| RL-SPE-19 | Interrupt playback with a notification or other source where practical. | Interruption is visible and timer state stays independent. |
+| RL-SPE-20 | Prepare audio, then trigger the numbered simulated transition. | Buffered playback starts within approximately 250 ms. |
+| RL-SPE-21 | With the proxy configured, prepare live audio. | Request-to-first-byte and media-ready/decode timing determine prefetch lead time. |
+| RL-SPE-22 | Disable the network before and during live generation. | Speech fails independently without delaying or corrupting timer behavior. |
+| RL-SPE-23 | Cancel generation or let it finish after its target transition. | The stale result is rejected and never replayed later. |
+| RL-SPE-24 | Operate the timer while speech generation and playback succeed or fail. | Timer projection and controls remain independent. |
 
 ### Decision threshold
 
@@ -375,6 +393,12 @@ offline, interruption, and Home Screen conditions?
 - If locality cannot be enforced reliably on a target environment, the product
   must withhold spoken private content there unless the online-speech opt-in is
   enabled.
+- External audio is viable only if at least one ordinary media path routes the
+  static fixture consistently to the TV, buffered playback begins within about
+  250 ms, a long session has no unexplained route changes or replay, provider
+  and network failures do not affect the timer, and credentials remain
+  server-side. Live generation itself may exceed 250 ms when reliable prefetch
+  meets the transition threshold.
 
 ## RL-DSP: landscape layout and television mirroring
 
