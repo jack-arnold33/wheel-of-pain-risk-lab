@@ -4,7 +4,7 @@ import App from './App'
 import './styles.css'
 
 function publishServiceWorkerState(state: string) {
-  window.dispatchEvent(new CustomEvent('risk-lab-sw-state', { detail: state }))
+  window.dispatchEvent(new CustomEvent('lab-sw-state', { detail: state }))
 }
 
 async function registerServiceWorker() {

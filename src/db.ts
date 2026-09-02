@@ -27,6 +27,21 @@ export type LabCaseId =
   | 'RL-SPE-22'
   | 'RL-SPE-23'
   | 'RL-SPE-24'
+  | 'RL-SPE-25'
+  | 'RL-SPE-26'
+  | 'RL-SPE-27'
+  | 'RL-SPE-28'
+  | 'RL-SPE-29'
+  | 'RL-SPE-30'
+  | 'RL-SPE-31'
+  | 'RL-SPE-32'
+  | 'RL-SPE-33'
+
+export interface StoredCredential {
+  id: 'openai-project-key'
+  value: string
+  lastFour: string
+}
 
 export interface LabRun {
   id: string
@@ -73,6 +88,7 @@ class RiskLabDatabase extends Dexie {
   runs!: Table<LabRun, string>
   events!: Table<LabEvent, number>
   checkpoints!: Table<TimerCheckpoint, string>
+  credentials!: Table<StoredCredential, string>
 
   constructor() {
     super('wheel-of-pain-risk-lab')
@@ -80,6 +96,12 @@ class RiskLabDatabase extends Dexie {
       runs: 'id, caseId, startedAt, verdict',
       events: '++id, runId, sequence, type',
       checkpoints: 'key, runId, status',
+    })
+    this.version(2).stores({
+      runs: 'id, caseId, startedAt, verdict',
+      events: '++id, runId, sequence, type',
+      checkpoints: 'key, runId, status',
+      credentials: 'id',
     })
   }
 }

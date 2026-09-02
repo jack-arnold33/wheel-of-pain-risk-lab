@@ -160,7 +160,10 @@ RL-SPE-01 through RL-SPE-08 exercise voices exposed by the browser or operating
 system. RL-SPE-09 through RL-SPE-24 are the separately approved external-audio
 routing extension. They use one generic pre-generated fixture and, when a
 server-side proxy is deliberately configured, the same generic live fixture.
-No private pack content or real participant identity is permitted.
+RL-SPE-25 through RL-SPE-33 form a distinct direct-browser OpenAI TTS
+feasibility gate. They use a manually entered owner project key and do not use
+or permit a proxy. No private pack content or real participant identity is
+permitted in any track.
 
 ## Experiment priority
 
@@ -350,6 +353,13 @@ offline, interruption, and Home Screen conditions?
 - RL-SPE-09 through RL-SPE-24 may contact only the configured server-side proxy
   and only for the visible generic fixture. Provider keys must never enter the
   browser, bundle, repository, logs, or exported evidence.
+- RL-SPE-25 through RL-SPE-33 are the explicit exception: the physical-device
+  UI may store one owner-supplied project key only in the dedicated IndexedDB
+  credential record and read it only while constructing the direct request.
+  The full value must never enter generic state, DOM redisplay, local/session
+  storage, URLs, logs, notes, exports, screenshots, caches, service-worker
+  messages, source, or build output. This does not prove client storage secure
+  or provider-recommended.
 - Network observation can reveal application requests but may not prove whether
   an operating-system voice uses an internal network service. Voice metadata
   and observed behavior must be reported without overstating certainty.
@@ -382,6 +392,15 @@ offline, interruption, and Home Screen conditions?
 | RL-SPE-22 | Disable the network before and during live generation. | Speech fails independently without delaying or corrupting timer behavior. |
 | RL-SPE-23 | Cancel generation or let it finish after its target transition. | The stale result is rejected and never replayed later. |
 | RL-SPE-24 | Operate the timer while speech generation and playback succeed or fail. | Timer projection and controls remain independent. |
+| RL-SPE-25 | Run the valid-key direct request in Safari and Home Screen mode, mirrored and unmirrored. | The CORS gate records observable 2xx MP3, observable non-2xx, or rejection before an observable response; physical output is phone, TV, both, or neither. |
+| RL-SPE-26 | Reload and cold-launch each mode after saving, then make a second request. | Only configured/last-four is restored and the full key is never redisplayed. |
+| RL-SPE-27 | Remove during work, reload, and attempt another request in each mode. | Work is aborted, prepared audio discarded, the record is absent, and request controls remain gated. |
+| RL-SPE-28 | Use a fake or deliberately invalid lab key in each mode. | Authentication is bounded without response-body or credential leakage. |
+| RL-SPE-29 | Cancel, replace, background, and return in separate runs. | Superseded results are rejected and never play late. |
+| RL-SPE-30 | Go offline before requesting while operating the timer. | Speech skips promptly and timer projection remains independent. |
+| RL-SPE-31 | Exercise prepared, zero-Prepare, and repeated one-shot playback on the TV route. | Current prepared audio starts within about 250 ms; missed/late audio never replays and object URLs are revoked. |
+| RL-SPE-32 | Exercise interruption and portrait/landscape rotation in each mode. | Routing and interruption are recorded without timer corruption or late replay. |
+| RL-SPE-33 | Erase/export and inspect the deployed service worker/cache behavior. | Credential, authorization, text/body, MP3/Blob/object URL, and upstream body are absent; no authenticated exchange is cached. |
 
 ### Decision threshold
 
@@ -398,7 +417,15 @@ offline, interruption, and Home Screen conditions?
   250 ms, a long session has no unexplained route changes or replay, provider
   and network failures do not affect the timer, and credentials remain
   server-side. Live generation itself may exceed 250 ms when reliable prefetch
-  meets the transition threshold.
+  is used. This threshold applies to the historical RL-SPE-09–24 track.
+- Direct-browser OpenAI TTS is viable only if the authenticated deployed Pages
+  request succeeds in both Safari and Home Screen mode without a proxy, the
+  MP3 routes through `HTMLAudioElement` to the exact TV, prepared playback meets
+  the approximately 250 ms threshold, failure/stale paths preserve timer
+  correctness, credential exclusion and removal are proven, the service worker
+  does not cache the exchange, and the owner accepts the bounded residual key
+  and spend risk. A reproducible CORS block is Fail for this architecture, not
+  an implementation defect.
 
 ## RL-DSP: landscape layout and television mirroring
 

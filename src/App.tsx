@@ -7,6 +7,8 @@ import {
   type TimerStatus,
 } from './timer'
 import SpeechExperiment from './SpeechExperiment'
+import DirectTtsExperiment from './DirectTtsExperiment'
+import { sanitizeEvidence } from './directTts'
 
 const CALLBACK_DELAY_MS = 10_000
 
@@ -61,6 +63,51 @@ const CASE_EXPECTATIONS: Record<LabCaseId, string> = {
   'RL-SPE-22': 'Network failure is contained to speech and timer behavior remains independent.',
   'RL-SPE-23': 'Failed, cancelled, or late results are rejected and never replayed at a later transition.',
   'RL-SPE-24': 'Timer projection and controls remain independent of speech generation and playback.',
+  'RL-SPE-25': 'The direct-request feasibility matrix records Safari and Home Screen, mirrored and unmirrored, response observability, MP3 playback, and destination.',
+  'RL-SPE-26': 'The saved-key indicator survives reload and cold launch, and a second request succeeds without redisplaying the key.',
+  'RL-SPE-27': 'Removing the key aborts work, discards audio, survives reload, and prevents another request.',
+  'RL-SPE-28': 'A deliberately invalid lab key produces only a bounded authentication result and no secret leakage.',
+  'RL-SPE-29': 'Cancellation, replacement, backgrounding, and visibility return cannot play a stale result.',
+  'RL-SPE-30': 'An offline request is skipped promptly and timer projection remains independent.',
+  'RL-SPE-31': 'Prepared, zero-Prepare, and repeated playback produce one-shot current audio with acceptable transition latency and no URL leak.',
+  'RL-SPE-32': 'Ordinary interruption and rotation are recorded without affecting timer correctness.',
+  'RL-SPE-33': 'Erase/export and service-worker inspection prove credentials, authenticated exchanges, fixture audio, and object URLs are excluded.',
+}
+
+type CaseTrack = 'core' | 'legacy-speech' | 'direct-tts'
+
+const CASE_OPTIONS: Record<CaseTrack, Array<[LabCaseId, string]>> = {
+  core: [
+    ['RL-TIM-01', 'RL-TIM-01 · foreground'], ['RL-TIM-02', 'RL-TIM-02 · callback delay'],
+    ['RL-WAK-01', 'RL-WAK-01 · keep awake'], ['RL-WAK-02', 'RL-WAK-02 · paused'],
+    ['RL-WAK-03', 'RL-WAK-03 · reacquire'], ['RL-WAK-04', 'RL-WAK-04 · Complete to Done'],
+    ['RL-WAK-05', 'RL-WAK-05 · end early'],
+  ],
+  'legacy-speech': Array.from({ length: 16 }, (_, index) => {
+    const id = `RL-SPE-${String(index + 9).padStart(2, '0')}` as LabCaseId
+    return [id, `${id} · historical routing experiment`]
+  }),
+  'direct-tts': [
+    ['RL-SPE-25', 'RL-SPE-25 · feasibility matrix'],
+    ['RL-SPE-26', 'RL-SPE-26 · reload persistence'],
+    ['RL-SPE-27', 'RL-SPE-27 · remove and reload'],
+    ['RL-SPE-28', 'RL-SPE-28 · invalid key'],
+    ['RL-SPE-29', 'RL-SPE-29 · lifecycle and stale results'],
+    ['RL-SPE-30', 'RL-SPE-30 · offline independence'],
+    ['RL-SPE-31', 'RL-SPE-31 · prepared playback matrix'],
+    ['RL-SPE-32', 'RL-SPE-32 · interruption and rotation'],
+    ['RL-SPE-33', 'RL-SPE-33 · erase, export, and caches'],
+  ],
+}
+
+function trackForCase(caseId: LabCaseId): CaseTrack {
+  if (!caseId.startsWith('RL-SPE-')) return 'core'
+  return Number(caseId.slice('RL-SPE-'.length)) >= 25 ? 'direct-tts' : 'legacy-speech'
+}
+
+function isDirectTtsCase(caseId: LabCaseId) {
+  if (!caseId.startsWith('RL-SPE-')) return false
+  return Number(caseId.slice('RL-SPE-'.length)) >= 25
 }
 
 function detectDisplayMode() {
@@ -86,7 +133,8 @@ function App() {
     routingConfiguration: '',
     musicPlaying: 'no',
   })
-  const [selectedCase, setSelectedCase] = useState<LabCaseId>('RL-TIM-01')
+  const [selectedCase, setSelectedCase] = useState<LabCaseId>('RL-SPE-25')
+  const [caseTrack, setCaseTrack] = useState<CaseTrack>('direct-tts')
   const [projection, setProjection] = useState<TimerProjection>(initialProjection)
   const [events, setEvents] = useState<LabEvent[]>([])
   const [activeRun, setActiveRun] = useState<LabRun | null>(null)
@@ -339,8 +387,8 @@ function App() {
     const listener = (event: Event) => {
       setServiceWorkerState((event as CustomEvent<string>).detail)
     }
-    window.addEventListener('risk-lab-sw-state', listener)
-    return () => window.removeEventListener('risk-lab-sw-state', listener)
+    window.addEventListener('lab-sw-state', listener)
+    return () => window.removeEventListener('lab-sw-state', listener)
   }, [])
 
   useEffect(() => {
@@ -520,14 +568,15 @@ function App() {
     setProjection(initialProjection())
     setResumeCountdown(null)
     setWarning('')
+    window.dispatchEvent(new Event('lab-run-reset'))
   }
 
   async function exportRun() {
     if (!activeRun) return
     const storedEvents = await db.events.where('runId').equals(activeRun.id).sortBy('sequence')
-    const report = {
+    const report = sanitizeEvidence({
       exportedAt: new Date().toISOString(),
-      labVersion: '0.1.0',
+      labVersion: '0.2.0',
       sourceCommit: __LAB_BUILD__,
       run: activeRun,
       environment: {
@@ -537,7 +586,7 @@ function App() {
       },
       expected: CASE_EXPECTATIONS[selectedCase],
       events: storedEvents,
-    }
+    })
     const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const anchor = document.createElement('a')
@@ -554,6 +603,7 @@ function App() {
     sequenceRef.current = storedEvents.at(-1)?.sequence ?? 0
     setActiveRun(run)
     setSelectedCase(run.caseId)
+    setCaseTrack(trackForCase(run.caseId))
     setEnvironment({
       deviceModel: run.deviceModel,
       osVersion: run.osVersion,
@@ -573,9 +623,10 @@ function App() {
 
   async function eraseAllData() {
     if (!window.confirm('Erase every risk-lab run, event, and checkpoint on this device?')) return
-    await db.transaction('rw', db.runs, db.events, db.checkpoints, async () => {
-      await Promise.all([db.runs.clear(), db.events.clear(), db.checkpoints.clear()])
+    await db.transaction('rw', db.runs, db.events, db.checkpoints, db.credentials, async () => {
+      await Promise.all([db.runs.clear(), db.events.clear(), db.checkpoints.clear(), db.credentials.clear()])
     })
+    window.dispatchEvent(new Event('lab-data-erased'))
     setCompletedRuns([])
     await resetTimer()
   }
@@ -625,12 +676,17 @@ function App() {
           <label>Receiver / TV<input value={environment.receiverModel} onChange={(event) => setEnvironment({ ...environment, receiverModel: event.target.value })} disabled={Boolean(activeRun)} placeholder="Model and intermediary" /></label>
           <label>Routing configuration<input value={environment.routingConfiguration} onChange={(event) => setEnvironment({ ...environment, routingConfiguration: event.target.value })} disabled={Boolean(activeRun)} placeholder="Screen mirroring / AirPlay path" /></label>
           <label>Workout music<select value={environment.musicPlaying} onChange={(event) => setEnvironment({ ...environment, musicPlaying: event.target.value as EnvironmentForm['musicPlaying'] })} disabled={Boolean(activeRun)}><option value="no">Not playing</option><option value="yes">Playing</option></select></label>
-          <label>Case<select value={selectedCase} onChange={(event) => setSelectedCase(event.target.value as LabCaseId)} disabled={Boolean(activeRun)}><option value="RL-TIM-01">RL-TIM-01 · foreground</option><option value="RL-TIM-02">RL-TIM-02 · callback delay</option><option value="RL-WAK-01">RL-WAK-01 · keep awake</option><option value="RL-WAK-02">RL-WAK-02 · paused</option><option value="RL-WAK-03">RL-WAK-03 · reacquire</option><option value="RL-WAK-04">RL-WAK-04 · Complete to Done</option><option value="RL-WAK-05">RL-WAK-05 · end early</option><optgroup label="External speech routing"><option value="RL-SPE-09">RL-SPE-09 · baseline, phone</option><option value="RL-SPE-10">RL-SPE-10 · baseline, mirrored</option><option value="RL-SPE-11">RL-SPE-11 · HTML audio, mirrored</option><option value="RL-SPE-12">RL-SPE-12 · Web Audio, mirrored</option><option value="RL-SPE-13">RL-SPE-13 · compare destinations</option><option value="RL-SPE-14">RL-SPE-14 · Safari vs Home Screen</option><option value="RL-SPE-15">RL-SPE-15 · with music</option><option value="RL-SPE-16">RL-SPE-16 · 20-play long session</option><option value="RL-SPE-17">RL-SPE-17 · background / restore</option><option value="RL-SPE-18">RL-SPE-18 · rotate</option><option value="RL-SPE-19">RL-SPE-19 · interrupt</option><option value="RL-SPE-20">RL-SPE-20 · prefetch transition</option><option value="RL-SPE-21">RL-SPE-21 · live latency</option><option value="RL-SPE-22">RL-SPE-22 · network failure</option><option value="RL-SPE-23">RL-SPE-23 · stale rejection</option><option value="RL-SPE-24">RL-SPE-24 · timer independence</option></optgroup></select></label>
+          <label>Case group<select value={caseTrack} onChange={(event) => { const next = event.target.value as CaseTrack; setCaseTrack(next); setSelectedCase(CASE_OPTIONS[next][0][0]) }} disabled={Boolean(activeRun)}><option value="direct-tts">Direct OpenAI browser gate</option><option value="core">Core timer and wake lock</option><option value="legacy-speech">Historical routing experiment</option></select></label>
+          <label>Case<select value={selectedCase} onChange={(event) => setSelectedCase(event.target.value as LabCaseId)} disabled={Boolean(activeRun)}>{CASE_OPTIONS[caseTrack].map(([id, label]) => <option key={id} value={id}>{label}</option>)}</select></label>
         </div>
       </section>
 
-      {selectedCase.startsWith('RL-SPE') && (
+      {selectedCase.startsWith('RL-SPE') && !isDirectTtsCase(selectedCase) && (
         <SpeechExperiment disabled={controlsDisabled} recordEvent={recordEvent} />
+      )}
+
+      {isDirectTtsCase(selectedCase) && (
+        <DirectTtsExperiment disabled={controlsDisabled} recordEvent={recordEvent} />
       )}
 
       {selectedCase.startsWith('RL-SPE') && activeRun && (
