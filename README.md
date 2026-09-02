@@ -25,11 +25,25 @@ physical iPhone and television setup is recorded.
 - [Risk-lab closeout](docs/closeout.md)
 - [External TTS physical-device procedure](docs/external-tts-test.md)
 - [External TTS decision record](docs/external-tts-decision.md)
+- [Direct TTS product handoff](docs/direct-tts-handoff.md)
 - [Candidate PWA stack](docs/stack-decision.md)
 - Source specification commit:
   [8d6eb2b](https://github.com/jack-arnold33/wheel-of-pain-timer/commit/8d6eb2b)
 
-## External TTS experiment
+## Direct-browser TTS experiment
+
+The active RL-SPE-25–33 track tests direct browser Fetch from the deployed
+GitHub Pages origin to OpenAI speech, MP3 buffering, and retained
+`HTMLAudioElement` playback. It has no proxy, SDK, provider abstraction, or
+fallback. Its key field is masked and stores only in a dedicated IndexedDB
+record after manual physical-device entry. The decision remains Inconclusive
+until the documented iPhone Safari, Home Screen, and exact mirrored-TV runs are
+entered.
+
+The UI separates this active nine-case track from core cases and the historical
+routing experiment so the case menu stays focused.
+
+## Historical external-routing experiment
 
 The RL-SPE extension compares browser `SpeechSynthesis`, a pre-generated WAV
 fixture through `HTMLAudioElement`, and that same fixture through Web Audio. It
@@ -40,7 +54,7 @@ generated outside the browser with the repository script.
 Run `pnpm test`, `pnpm typecheck`, and `pnpm build` for automated verification.
 No lint script is configured in this repository.
 
-Live generation is opt-in. Copy `.env.live.example` to `.env.local`, set
+Historical proxy generation is opt-in. Copy `.env.live.example` to `.env.local`, set
 `OPENAI_API_KEY` only in the server process environment, run `pnpm tts-proxy`,
 and start the Vite development server separately. A static GitHub Pages build
 does not provide the proxy. Never put a provider key in a `VITE_*` variable.

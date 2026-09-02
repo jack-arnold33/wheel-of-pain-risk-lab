@@ -45,6 +45,11 @@ active smoke test, such as:
 - external-speech playback method, request start, first response byte when
   measurable, media-ready or decode time, playback request, start, completion,
   interruption, cancellation, failure, and stale-result rejection.
+- direct-speech case/run IDs; launch mode, visibility, online and mirroring
+  setup; request start; Fetch resolution/rejection; HTTP status class when
+  observable; response audio content type and byte count; media ready;
+  playback requested/playing/ended/interrupted/skipped/cancelled/failed; bounded
+  failure category; and Fetch, completion, readiness, and playing latency.
 
 Sequence number is the reliable event order if the tester changes the device
 clock. The log does not need a formal event-schema framework or exhaustive
@@ -67,6 +72,8 @@ than expanding the harness into a general testing platform.
 - Per-experiment reset clears only that experiment's disposable state.
 - Reset does not erase completed reports from other experiments.
 - Erase All is explicit and confirmed.
+- Erase All also deletes the dedicated credential record and aborts/discards
+  direct-speech work and audio.
 
 The lab only needs the simplest storage approach that can demonstrate these
 behaviors. The final application's data model and migration architecture are
@@ -77,11 +84,18 @@ out of scope.
 All fixtures are synthetic. Reports remain on-device unless exported by the
 tester. The lab sends no analytics, evidence, identifiers, or private text to
 GitHub or another service. Ordinary GitHub Pages resource and update requests
-are expected while online. The optional external-TTS case is a narrow
-exception: after explicit tester action it sends only the displayed synthetic
-fixture to the configured same-origin proxy. Exports log its fixture ID and
-character count, not the complete utterance. Provider credentials exist only
-in the proxy process environment.
+are expected while online. RL-SPE-09–24 may send only their synthetic fixture
+to the configured same-origin proxy. RL-SPE-25–33 are a separate explicit
+exception: after a tester tap they send only fixture `wheel-awaits-v1` directly
+to the documented OpenAI speech endpoint using the dedicated local credential.
+
+Direct-speech evidence and exports must never contain the full credential,
+Authorization header, approved sentence, request or upstream body, response
+body, fixture audio, Blob, object URL, or service-worker message. They may show
+configured/not configured, last four characters, fixture ID, bounded timings,
+status class, content type, byte count, and normalized failure. Browser Fetch
+rejection without an observable response is `cors-or-network`; the report must
+not claim headers or status were read through a CORS block.
 
 ## Good-enough evidence
 

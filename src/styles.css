@@ -147,6 +147,11 @@ button.danger { border-color: #ff6b6b; }
 .wake-lock-failed, .wake-lock-unsupported, .wake-lock-released { border-color: #ffcc66; }
 .wake-lock-failed strong, .wake-lock-unsupported strong, .wake-lock-released strong { color: #ffcc66; }
 .test-hint { max-width: 50rem; margin: 1rem auto 0; color: #9dadc4; font-size: 0.9rem; text-align: center; }
+.request-contract { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.45rem; margin: 1rem 0; }
+.request-contract div { min-width: 0; padding: 0.65rem; border: 1px solid #2a3548; border-radius: 0.5rem; background: #111827; }
+.request-contract dt { color: #71829c; font-size: 0.72rem; text-transform: uppercase; }
+.request-contract dd { margin: 0.25rem 0 0; overflow-wrap: anywhere; }
+.credential-entry { max-width: 36rem; margin: 1rem 0; }
 
 .evidence-panel { margin-top: 1rem; padding: 1rem; }
 .evidence-heading { display: flex; justify-content: space-between; gap: 1rem; align-items: center; }
@@ -182,6 +187,7 @@ button.danger { border-color: #ff6b6b; }
   .stored-runs { grid-template-columns: 1fr; }
   .wake-lock-card { align-items: stretch; flex-direction: column; }
   .observation-grid { grid-template-columns: 1fr; }
+  .request-contract { grid-template-columns: 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {
